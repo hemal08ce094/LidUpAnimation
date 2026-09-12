@@ -22,6 +22,47 @@ hinge shuts. Open it back up before the Mac sleeps and it returns the same way.
 </p>
 <p align="center"><a href="docs/lidup-duo.mp4">Full-quality video</a></p>
 
+## How it works
+
+**The hinge has a sensor.** Every recent MacBook has a small angle sensor in
+the hinge between the keyboard and the lid. macOS uses it to know when the lid
+is about to close so it can put the Mac to sleep at the right moment. The
+sensor reports the opening angle in degrees: 0° is fully closed, roughly 90°
+is the lid straight up, and most people work somewhere around 110° to 130°.
+On recent models it reports in hundredths of a degree, about ten times a
+second.
+
+**Lid Up reads that angle.** macOS exposes the sensor as a plain input
+device (the same interface a keyboard or trackpad uses), so the app can read
+it without any special permission. While the lid sits still, the app checks
+it ten times a second and does nothing else.
+
+**The lid starts to move.** As soon as the angle begins to drop, the app
+starts a live stream of your built-in display through ScreenCaptureKit. This
+is why Screen Recording is the one permission it asks for. The stream only
+runs while the lid is moving and stops a few seconds after it settles.
+
+**The picture stays where the screen was.** Once the lid has closed a couple
+of degrees past where it was resting, the app puts a full-screen, click-through
+window over the display. Instead of showing the desktop flat on the glass, it
+draws it as if the desktop were a sheet floating in the air exactly where the
+screen used to be, viewed from where you are sitting. As the physical screen
+tilts through that sheet, the picture appears to stay in place: the top slides
+off the glass into black, the sides fan out with perspective, and the whole
+image frosts over and darkens. By about 25° it is fully black, just before
+macOS puts the Mac to sleep.
+
+**Open it again and it comes back.** If you lift the lid before the Mac
+sleeps, the same maths runs in reverse and the desktop slides back into
+place. Once the lid passes the anchor angle, or holds still for a couple of
+seconds, the overlay fades out and hands the screen back.
+
+**Under the hood.** Everything is drawn on the GPU with Metal: each screen
+pixel is traced back through the tilted glass to the anchored picture, and a
+blur pyramid and darkening curve are applied by height. A small spring
+smooths the ten-per-second sensor readings into motion at the display's
+refresh rate.
+
 ## Requirements
 
 - A MacBook with the continuous lid angle sensor (M2 MacBook Air or later,
