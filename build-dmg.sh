@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 #
-# Builds a Release LidUpAnimation.app and wraps it in a drag-to-Applications
-# DMG at dist/LidUpAnimation-<version>.dmg.
+# Builds LidUpAnimation.app and wraps it in a drag-to-Applications DMG at
+# dist/LidUpAnimation-<version>.dmg.
 #
-#   ./build-dmg.sh                 sign with the identity in the Xcode project
-#   SIGN_IDENTITY=- ./build-dmg.sh ad-hoc signature (what CI produces)
-#   SIGN_IDENTITY="Developer ID Application: Name (TEAM)" ./build-dmg.sh
-#   NOTARY_PROFILE=<keychain profile> ./build-dmg.sh   also notarize + staple
+#   ./build-dmg.sh                       Developer ID via Xcode archive/export,
+#                                        notarized and stapled when
+#                                        NOTARY_PROFILE is set (default: LidUp)
+#   NOTARY_PROFILE= ./build-dmg.sh       Developer ID, skip notarization
+#   SIGN_IDENTITY=- ./build-dmg.sh       ad-hoc signature (what CI produces);
+#                                        users need Privacy & Security → Open Anyway
 #
-# Without a Developer ID certificate and notarization, macOS shows
-# "Apple could not verify" on first open. The README explains Open Anyway.
+# The Developer ID certificate is cloud-managed by Xcode, so the signing goes
+# through xcodebuild -exportArchive rather than a local codesign identity.
+# TEAM_ID defaults to the team in the project.
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -18,38 +21,56 @@ APP_NAME="LidUpAnimation"
 DISPLAY_NAME="Lid Up"
 BUILD_DIR="build"
 DIST_DIR="dist"
-# Default matches the identity in the Xcode project.
-SIGN_IDENTITY="${SIGN_IDENTITY:-Apple Development}"
-NOTARY_PROFILE="${NOTARY_PROFILE:-}"
+TEAM_ID="${TEAM_ID:-542W8Z2VM3}"
+SIGN_IDENTITY="${SIGN_IDENTITY:-developer-id}"
+NOTARY_PROFILE="${NOTARY_PROFILE-LidUp}"
 
-echo "Building Release…"
-# "-" means ad-hoc: no team, no timestamp, no hardened runtime.
-XCODE_SIGN_ARGS=()
-CODESIGN_ARGS=()
+filter() { grep -E "error:|warning: .*\.swift|SUCCEEDED|FAILED" || true; }
+
 if [ "$SIGN_IDENTITY" = "-" ]; then
-  XCODE_SIGN_ARGS=(CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= CODE_SIGN_STYLE=Manual)
-  CODESIGN_ARGS=()
+  echo "Building Release, ad-hoc signed…"
+  xcodebuild -project "$APP_NAME.xcodeproj" -scheme "$APP_NAME" -configuration Release \
+    -derivedDataPath "$BUILD_DIR" -destination 'platform=macOS' build \
+    CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= CODE_SIGN_STYLE=Manual | filter
+  APP="$BUILD_DIR/Build/Products/Release/$APP_NAME.app"
+  [ -d "$APP" ] || { echo "build failed: $APP missing" >&2; exit 1; }
+  # An incremental build can keep an older signature.
+  codesign --force --deep --sign - "$APP"
+  NOTARY_PROFILE=""
 else
-  XCODE_SIGN_ARGS=(CODE_SIGN_IDENTITY="$SIGN_IDENTITY")
-  CODESIGN_ARGS=(--options runtime --timestamp)
+  echo "Archiving Release…"
+  ARCHIVE="$BUILD_DIR/$APP_NAME.xcarchive"
+  EXPORT="$BUILD_DIR/export"
+  rm -rf "$ARCHIVE" "$EXPORT"
+  xcodebuild -project "$APP_NAME.xcodeproj" -scheme "$APP_NAME" -configuration Release \
+    -derivedDataPath "$BUILD_DIR" -archivePath "$ARCHIVE" -allowProvisioningUpdates \
+    CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_IDENTITY="Apple Development" \
+    archive | filter
+  OPTIONS=$(mktemp -t exportoptions).plist
+  cat > "$OPTIONS" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>method</key><string>developer-id</string>
+  <key>signingStyle</key><string>automatic</string>
+  <key>teamID</key><string>$TEAM_ID</string>
+  <key>destination</key><string>export</string>
+</dict></plist>
+PLIST
+  echo "Exporting with Developer ID…"
+  xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist "$OPTIONS" \
+    -exportPath "$EXPORT" -allowProvisioningUpdates | filter
+  rm -f "$OPTIONS"
+  APP="$EXPORT/$APP_NAME.app"
+  [ -d "$APP" ] || { echo "export failed: $APP missing" >&2; exit 1; }
 fi
 
-xcodebuild -project "$APP_NAME.xcodeproj" -scheme "$APP_NAME" -configuration Release \
-  -derivedDataPath "$BUILD_DIR" -destination 'platform=macOS' build \
-  "${XCODE_SIGN_ARGS[@]}" \
-  | grep -E "error:|warning: .*\.swift|BUILD" || true
-
-APP="$BUILD_DIR/Build/Products/Release/$APP_NAME.app"
-[ -d "$APP" ] || { echo "build failed: $APP missing" >&2; exit 1; }
+codesign --verify --strict --verbose=1 "$APP"
+codesign -dv "$APP" 2>&1 | grep -E "^Authority=|TeamIdentifier|flags" | head -3
 
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist")
 BUILD=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$APP/Contents/Info.plist")
 DMG="$DIST_DIR/$APP_NAME-$VERSION.dmg"
-
-# Always re-sign: an incremental build can keep the previous signature.
-echo "Signing app with ${SIGN_IDENTITY}…"
-codesign --force --deep ${CODESIGN_ARGS[@]+"${CODESIGN_ARGS[@]}"} --sign "$SIGN_IDENTITY" "$APP"
-codesign --verify --strict --verbose=1 "$APP"
 
 echo "Packaging ${DMG}…"
 STAGING=$(mktemp -d)
@@ -60,14 +81,15 @@ ln -s /Applications "$STAGING/Applications"
 hdiutil create -quiet -volname "$DISPLAY_NAME" -srcfolder "$STAGING" -ov -format UDZO "$DMG"
 rm -rf "$STAGING"
 
-if [ "$SIGN_IDENTITY" != "-" ]; then
-  codesign --force --timestamp --sign "$SIGN_IDENTITY" "$DMG"
-fi
-
 if [ -n "$NOTARY_PROFILE" ]; then
-  echo "Notarizing…"
+  echo "Notarizing with profile ${NOTARY_PROFILE}…"
   xcrun notarytool submit "$DMG" --keychain-profile "$NOTARY_PROFILE" --wait
   xcrun stapler staple "$DMG"
+  xcrun stapler validate "$DMG"
+  # Gatekeeper judges the app, not the (unsigned) disk image.
+  MOUNT=$(hdiutil attach -nobrowse -readonly "$DMG" | tail -1 | awk -F'\t' '{print $NF}')
+  spctl --assess --type execute -v "$MOUNT/$APP_NAME.app"
+  hdiutil detach -quiet "$MOUNT"
 fi
 
 shasum -a 256 "$DMG" | tee "$DIST_DIR/$APP_NAME-$VERSION.sha256"

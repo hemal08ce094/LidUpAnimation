@@ -31,16 +31,18 @@ ad-hoc signing every build would need it granted again.
 1. Download `LidUpAnimation-<version>.dmg` from the
    [latest release](https://github.com/hemal08ce094/LidUpAnimation/releases/latest),
    open it, and drag **Lid Up** into **Applications**.
-2. The app is signed with a development certificate, not a Developer ID, so
-   macOS will say it cannot verify the developer on first open. Go to
-   **System Settings → Privacy & Security**, scroll to **Security**, click
-   **Open Anyway**, then confirm **Open**.
+2. Open it. Release DMGs are signed with Developer ID and notarized by Apple,
+   so there is no security dialog.
 3. Grant **Screen Recording** when the app asks, then relaunch it.
 
-To build the DMG yourself: `./build-dmg.sh` writes `dist/LidUpAnimation-<version>.dmg`
-and a SHA-256 file. With a Developer ID certificate and a notarytool keychain
-profile, `SIGN_IDENTITY="Developer ID Application: …" NOTARY_PROFILE=<name> ./build-dmg.sh`
-produces a notarized DMG that opens without the Open Anyway step.
+Building the DMG: `./build-dmg.sh` archives a Release build, exports it with
+the team's Developer ID certificate, wraps it in a DMG, submits it to Apple's
+notary service using the `LidUp` keychain profile
+(`xcrun notarytool store-credentials LidUp …`), staples the ticket and writes
+`dist/LidUpAnimation-<version>.dmg` plus a SHA-256 file. `SIGN_IDENTITY=-`
+builds an ad-hoc DMG instead; the GitHub Actions workflow produces one of
+those as a build artifact for every `v*` tag, and users of it need
+**Privacy & Security → Open Anyway**.
 
 ## Build and run
 
