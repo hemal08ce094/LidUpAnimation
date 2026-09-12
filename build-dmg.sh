@@ -75,7 +75,7 @@ DMG="$DIST_DIR/$APP_NAME-$VERSION.dmg"
 echo "Packaging ${DMG}…"
 STAGING=$(mktemp -d)
 mkdir -p "$DIST_DIR"
-rm -f "$DMG"
+rm -f "$DMG" "$DIST_DIR/$APP_NAME-$VERSION.sha256"
 cp -R "$APP" "$STAGING/"
 ln -s /Applications "$STAGING/Applications"
 hdiutil create -quiet -volname "$DISPLAY_NAME" -srcfolder "$STAGING" -ov -format UDZO "$DMG"
