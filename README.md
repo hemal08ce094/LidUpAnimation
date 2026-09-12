@@ -2,6 +2,17 @@
 
 The iPhone Duo folding animation, recreated for the MacBook Pro lid.
 
+### [⬇ Download Lid Up for Mac (DMG)](https://github.com/hemal08ce094/LidUpAnimation/releases/latest/download/LidUpAnimation-1.0.dmg)
+
+[![Latest release](https://img.shields.io/github/v/release/hemal08ce094/LidUpAnimation?label=release)](https://github.com/hemal08ce094/LidUpAnimation/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/hemal08ce094/LidUpAnimation/total?label=downloads)](https://github.com/hemal08ce094/LidUpAnimation/releases)
+![macOS 15+](https://img.shields.io/badge/macOS-15%2B-333333)
+![Notarized](https://img.shields.io/badge/Developer%20ID-notarized-2ea44f)
+
+Signed with Developer ID and notarized by Apple: open the DMG, drag **Lid Up**
+to Applications, launch, grant Screen Recording. No security dialog.
+[All releases →](https://github.com/hemal08ce094/LidUpAnimation/releases)
+
 Close the lid and the desktop stays anchored in space while the glass sweeps
 through it: the picture tilts, frosts over and slips into black before the
 hinge shuts. Open it back up before the Mac sleeps and it returns the same way.
