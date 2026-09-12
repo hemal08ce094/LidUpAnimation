@@ -26,6 +26,22 @@ macOS ties the Screen Recording grant to the app's code signature. The project
 signs with an Apple Development identity so the grant survives rebuilds; with
 ad-hoc signing every build would need it granted again.
 
+## Install from the DMG
+
+1. Download `LidUpAnimation-<version>.dmg` from the
+   [latest release](https://github.com/hemal08ce094/LidUpAnimation/releases/latest),
+   open it, and drag **Lid Up** into **Applications**.
+2. The app is signed with a development certificate, not a Developer ID, so
+   macOS will say it cannot verify the developer on first open. Go to
+   **System Settings → Privacy & Security**, scroll to **Security**, click
+   **Open Anyway**, then confirm **Open**.
+3. Grant **Screen Recording** when the app asks, then relaunch it.
+
+To build the DMG yourself: `./build-dmg.sh` writes `dist/LidUpAnimation-<version>.dmg`
+and a SHA-256 file. With a Developer ID certificate and a notarytool keychain
+profile, `SIGN_IDENTITY="Developer ID Application: …" NOTARY_PROFILE=<name> ./build-dmg.sh`
+produces a notarized DMG that opens without the Open Anyway step.
+
 ## Build and run
 
 Open `LidUpAnimation.xcodeproj` in Xcode and run, or:

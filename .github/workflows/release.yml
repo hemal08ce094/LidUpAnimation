@@ -1,0 +1,30 @@
+name: Release DMG
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dmg:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+      - name: Build DMG (ad-hoc signed)
+        run: SIGN_IDENTITY=- ./build-dmg.sh
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LidUpAnimation-dmg
+          path: dist/*
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
