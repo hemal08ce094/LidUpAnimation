@@ -6,6 +6,11 @@ Close the lid and the desktop stays anchored in space while the glass sweeps
 through it: the picture tilts, frosts over and slips into black before the
 hinge shuts. Open it back up before the Mac sleeps and it returns the same way.
 
+<p align="center">
+  <img src="docs/lidup-duo.gif" width="270" alt="Lid Up folding the desktop into the hinge as the MacBook lid closes">
+</p>
+<p align="center"><a href="docs/lidup-duo.mp4">Full-quality video</a></p>
+
 ## Requirements
 
 - A MacBook with the continuous lid angle sensor (M2 MacBook Air or later,
