@@ -1,5 +1,6 @@
 import Foundation
 import IOKit.hid
+import os
 import QuartzCore
 
 /// Reads the MacBook lid hinge angle from Apple's built-in orientation sensor.
@@ -100,10 +101,18 @@ final class LidAngleSensor {
             kIOHIDDeviceUsageKey: 0x8A,
         ]
         IOHIDManagerSetDeviceMatching(manager, matching as CFDictionary)
-        guard IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone)) == kIOReturnSuccess else { return }
+        let opened = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
+        guard opened == kIOReturnSuccess else {
+            Logger(subsystem: "com.hemalmodi.LidUpAnimation", category: "sensor").error("manager open failed: 0x\(String(UInt32(bitPattern: opened), radix: 16), privacy: .public)")
+            return
+        }
         self.manager = manager
 
-        guard let devices = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> else { return }
+        guard let devices = IOHIDManagerCopyDevices(manager) as? Set<IOHIDDevice> else {
+            Logger(subsystem: "com.hemalmodi.LidUpAnimation", category: "sensor").error("no device set returned")
+            return
+        }
+        Logger(subsystem: "com.hemalmodi.LidUpAnimation", category: "sensor").notice("matched \(devices.count) device(s)")
         for candidate in devices {
             // An external display can expose the same usage and always reads 0.
             let builtIn = (IOHIDDeviceGetProperty(candidate, kIOHIDBuiltInKey as CFString) as? NSNumber)?.boolValue ?? false
@@ -128,7 +137,12 @@ final class LidAngleSensor {
             guard let base = pointer.baseAddress else { return kIOReturnBadArgument }
             return IOHIDDeviceGetReport(device, kIOHIDReportTypeFeature, CFIndex(resolution.reportID), base, &length)
         }
-        guard status == kIOReturnSuccess, length > 0, buffer[0] == UInt8(resolution.reportID) else { return nil }
+        guard status == kIOReturnSuccess, length > 0, buffer[0] == UInt8(resolution.reportID) else {
+            if status != kIOReturnSuccess, !isAvailable {
+                Logger(subsystem: "com.hemalmodi.LidUpAnimation", category: "sensor").error("report \(resolution.reportID) failed: 0x\(String(UInt32(bitPattern: status), radix: 16), privacy: .public)")
+            }
+            return nil
+        }
 
         let degrees: Double
         switch resolution {

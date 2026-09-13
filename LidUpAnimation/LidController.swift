@@ -122,6 +122,7 @@ final class LidController: ObservableObject {
 
     func start() {
         isSensorAvailable = sensor.isAvailable
+        lidLog.notice("start: sensor available \(self.sensor.isAvailable) sandboxed \(ProcessInfo.processInfo.environment["APP_SANDBOX_CONTAINER_ID"] != nil) screen recording \(ScreenRecordingPermission.isGranted)")
         guard isSensorAvailable else {
             statusMessage = "No lid angle sensor on this Mac."
             return
