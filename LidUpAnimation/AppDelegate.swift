@@ -13,7 +13,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let arguments = CommandLine.arguments
         if let index = arguments.firstIndex(of: "--render-check") {
             let directory = arguments.indices.contains(index + 1) ? arguments[index + 1] : "render-check"
-            exit(RenderCheck.run(outputDirectory: directory))
+            let source = arguments.indices.contains(index + 2) ? arguments[index + 2] : nil
+            let size = arguments.indices.contains(index + 3) ? arguments[index + 3] : nil
+            exit(RenderCheck.run(outputDirectory: directory, sourceImage: source, pointSize: size))
         }
 
         controller.start()

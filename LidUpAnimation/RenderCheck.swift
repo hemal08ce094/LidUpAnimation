@@ -4,18 +4,33 @@ import Metal
 /// Offscreen check: renders the fold over generated artwork at a series of
 /// lid angles and writes PNGs, so the look can be inspected without a lid.
 ///
-///     LidUpAnimation --render-check /path/to/output
+///     LidUpAnimation --render-check /path/to/output [source-image [WxH]]
+///
+/// With a source image the frames are rendered over it instead of the
+/// generated artwork, at the given point size (default 1440x900, at 2x).
 enum RenderCheck {
 
-    static func run(outputDirectory: String) -> Int32 {
-        let size = CGSize(width: 1512, height: 982)
+    static func run(outputDirectory: String, sourceImage: String? = nil, pointSize: String? = nil) -> Int32 {
+        var size = CGSize(width: 1512, height: 982)
+        if let pointSize {
+            let parts = pointSize.split(separator: "x").compactMap { Double($0) }
+            if parts.count == 2 { size = CGSize(width: parts[0], height: parts[1]) }
+        } else if sourceImage != nil {
+            size = CGSize(width: 1440, height: 900)
+        }
         let scale: CGFloat = 2
         guard let renderer = FoldRenderer() else {
             FileHandle.standardError.write("no Metal renderer\n".data(using: .utf8)!)
             return 1
         }
         guard renderer.begin(screenSize: size, pixelScale: scale) else { return 1 }
-        guard let artwork = makeArtwork(width: Int(size.width * scale), height: Int(size.height * scale)) else { return 1 }
+        let artwork: CGImage?
+        if let sourceImage {
+            artwork = loadFilling(path: sourceImage, width: Int(size.width * scale), height: Int(size.height * scale))
+        } else {
+            artwork = makeArtwork(width: Int(size.width * scale), height: Int(size.height * scale))
+        }
+        guard let artwork else { return 1 }
         renderer.absorb(image: artwork)
 
         let directory = URL(fileURLWithPath: outputDirectory)
@@ -45,6 +60,20 @@ enum RenderCheck {
         save(image: artwork, to: directory.appendingPathComponent("source.png"))
         print("wrote \(angles.count) frames to \(directory.path)")
         return 0
+    }
+
+    /// Scales an image to fill the target the way the desktop does.
+    private static func loadFilling(path: String, width: Int, height: Int) -> CGImage? {
+        guard let image = NSImage(contentsOfFile: path) else { return nil }
+        let canvas = NSImage(size: NSSize(width: width, height: height))
+        canvas.lockFocus()
+        let source = image.size
+        let fill = max(CGFloat(width) / source.width, CGFloat(height) / source.height)
+        let drawn = NSSize(width: source.width * fill, height: source.height * fill)
+        image.draw(in: NSRect(x: (CGFloat(width) - drawn.width) / 2, y: (CGFloat(height) - drawn.height) / 2,
+                              width: drawn.width, height: drawn.height))
+        canvas.unlockFocus()
+        return canvas.cgImage(forProposedRect: nil, context: nil, hints: nil)
     }
 
     private static func makeArtwork(width: Int, height: Int) -> CGImage? {

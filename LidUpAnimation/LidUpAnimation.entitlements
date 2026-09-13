@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Required for Mac App Store distribution. -->
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- The only device entitlement under which the sandbox lets IOKit HID
+	     open Apple's built-in lid angle sensor. Nothing is written to any
+	     device; the app reads one feature report from the hinge sensor. -->
+	<key>com.apple.security.device.usb</key>
+	<true/>
+</dict>
+</plist>
