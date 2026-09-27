@@ -2,3 +2,4 @@ build/
 dist/
 xcuserdata/
 .DS_Store
+store/
