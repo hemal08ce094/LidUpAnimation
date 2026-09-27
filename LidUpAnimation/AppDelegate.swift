@@ -13,11 +13,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let arguments = CommandLine.arguments
         if let index = arguments.firstIndex(of: "--render-check") {
-            let directory = arguments.indices.contains(index + 1) ? arguments[index + 1] : "render-check"
-            let source = arguments.indices.contains(index + 2) ? arguments[index + 2] : nil
-            let size = arguments.indices.contains(index + 3) ? arguments[index + 3] : nil
-            let style = arguments.indices.contains(index + 4) ? arguments[index + 4] : nil
-            exit(RenderCheck.run(outputDirectory: directory, sourceImage: source, pointSize: size, styleFilter: style))
+            // "-" as a placeholder skips an optional positional argument, so
+            // a later one (size, style) can be given without a source image.
+            func arg(_ offset: Int) -> String? {
+                guard arguments.indices.contains(index + offset) else { return nil }
+                let value = arguments[index + offset]
+                return value == "-" ? nil : value
+            }
+            let directory = arg(1) ?? "render-check"
+            exit(RenderCheck.run(outputDirectory: directory, sourceImage: arg(2), pointSize: arg(3), styleFilter: arg(4)))
         }
 
         try? Tips.configure()
