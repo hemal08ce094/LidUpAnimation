@@ -6,13 +6,39 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		07004108F0FAFF0AF0878622 /* Drawably in Frameworks */ = {isa = PBXBuildFile; productRef = 05B3BFF48F01019B99C4C88A /* Drawably */; };
+		350A248A76D08F9D9964300B /* ThinkingOrbs in Frameworks */ = {isa = PBXBuildFile; productRef = 97105E12C081F5A13423CE2F /* ThinkingOrbs */; };
+		5B00A67519A632C224252AE1 /* PreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562AC86442BCEAA3FFFA49E5 /* PreferencesTests.swift */; };
+		6BA26CC3517BBDA8493EBD8A /* IntentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247956562AA54F01DD23A097 /* IntentTests.swift */; };
+		8E178C245618C83E83F1FD58 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C46AA82E2BAE77BED12284A9 /* Cocoa.framework */; };
+		FC529927A6CE11B247532F94 /* FoldStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D5F83CC8B8A9AEF075AD38B /* FoldStyleTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		835A56463DF37BAD519DAB61 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000000 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 000000000000000100000000;
+			remoteInfo = LidUpAnimation;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* LidUpAnimation.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LidUpAnimation.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		247956562AA54F01DD23A097 /* IntentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = IntentTests.swift; sourceTree = "<group>"; };
+		562AC86442BCEAA3FFFA49E5 /* PreferencesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreferencesTests.swift; sourceTree = "<group>"; };
+		8D5F83CC8B8A9AEF075AD38B /* FoldStyleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FoldStyleTests.swift; sourceTree = "<group>"; };
+		C46AA82E2BAE77BED12284A9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		EE5887A6CE9F200732A2C7A8 /* LidUpAnimationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LidUpAnimationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		000000000000000000000010 /* LidUpAnimation */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = LidUpAnimation;
 			sourceTree = "<group>";
 		};
@@ -22,7 +48,17 @@
 		000000000000000130000000 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				350A248A76D08F9D9964300B /* ThinkingOrbs in Frameworks */,
+				07004108F0FAFF0AF0878622 /* Drawably in Frameworks */,
 			);
+		};
+		1D00D353FD6496859E402148 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8E178C245618C83E83F1FD58 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -32,6 +68,8 @@
 			children = (
 				000000000000000000000010 /* LidUpAnimation */,
 				000000000000000000000020 /* Products */,
+				D8C1D781F573516BD6D9451F /* Frameworks */,
+				27130453963539D0636B0630 /* LidUpAnimationTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -39,8 +77,36 @@
 			isa = PBXGroup;
 			children = (
 				000000000000000000000120 /* LidUpAnimation.app */,
+				EE5887A6CE9F200732A2C7A8 /* LidUpAnimationTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1D4F8CA88EF84F03CE14C6FD /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				C46AA82E2BAE77BED12284A9 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		27130453963539D0636B0630 /* LidUpAnimationTests */ = {
+			isa = PBXGroup;
+			children = (
+				8D5F83CC8B8A9AEF075AD38B /* FoldStyleTests.swift */,
+				562AC86442BCEAA3FFFA49E5 /* PreferencesTests.swift */,
+				247956562AA54F01DD23A097 /* IntentTests.swift */,
+			);
+			name = LidUpAnimationTests;
+			path = LidUpAnimationTests;
+			sourceTree = "<group>";
+		};
+		D8C1D781F573516BD6D9451F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1D4F8CA88EF84F03CE14C6FD /* OS X */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -56,13 +122,37 @@
 			);
 			buildRules = (
 			);
+			dependencies = (
+			);
 			fileSystemSynchronizedGroups = (
 				000000000000000000000010 /* LidUpAnimation */,
 			);
 			name = LidUpAnimation;
+			packageProductDependencies = (
+				97105E12C081F5A13423CE2F /* ThinkingOrbs */,
+				05B3BFF48F01019B99C4C88A /* Drawably */,
+			);
 			productName = MyApp;
 			productReference = 000000000000000000000120 /* LidUpAnimation.app */;
 			productType = "com.apple.product-type.application";
+		};
+		87AF476DCD5843A920CC0FB0 /* LidUpAnimationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1CFC9210EB632182F72D467A /* Build configuration list for PBXNativeTarget "LidUpAnimationTests" */;
+			buildPhases = (
+				543145F0467EA7FB26558BB7 /* Sources */,
+				1D00D353FD6496859E402148 /* Frameworks */,
+				4F3DF9ECC30916FA5F2C190D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AC0CF4B7589BB15AFB5B94C2 /* PBXTargetDependency */,
+			);
+			name = LidUpAnimationTests;
+			productName = LidUpAnimationTests;
+			productReference = EE5887A6CE9F200732A2C7A8 /* LidUpAnimationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -88,12 +178,17 @@
 			);
 			mainGroup = 000000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4F28541E400965544586353C /* XCRemoteSwiftPackageReference "ThinkingOrbsSwiftUI" */,
+				1800E3466F70EB0444A4FA85 /* XCRemoteSwiftPackageReference "DrawablySwiftUI" */,
+			);
 			preferredProjectObjectVersion = 90;
 			productRefGroup = 000000000000000000000020 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				000000000000000100000000 /* LidUpAnimation */,
+				87AF476DCD5843A920CC0FB0 /* LidUpAnimationTests */,
 			);
 		};
 /* End PBXProject section */
@@ -104,6 +199,13 @@
 			files = (
 			);
 		};
+		4F3DF9ECC30916FA5F2C190D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -112,10 +214,29 @@
 			files = (
 			);
 		};
+		543145F0467EA7FB26558BB7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC529927A6CE11B247532F94 /* FoldStyleTests.swift in Sources */,
+				5B00A67519A632C224252AE1 /* PreferencesTests.swift in Sources */,
+				6BA26CC3517BBDA8493EBD8A /* IntentTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		AC0CF4B7589BB15AFB5B94C2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LidUpAnimation;
+			target = 000000000000000100000000 /* LidUpAnimation */;
+			targetProxy = 835A56463DF37BAD519DAB61 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
-		000000000000000011000000 /* Debug configuration for PBXProject "LidUpAnimation" */ = {
+		000000000000000011000000 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -185,7 +306,7 @@
 			};
 			name = Debug;
 		};
-		000000000000000012000000 /* Release configuration for PBXProject "LidUpAnimation" */ = {
+		000000000000000012000000 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -247,27 +368,27 @@
 			};
 			name = Release;
 		};
-		000000000000000111000000 /* Debug configuration for PBXNativeTarget "LidUpAnimation" */ = {
+		000000000000000111000000 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LidUpAnimation/LidUpAnimation.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 542W8Z2VM3;
-				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lid Up";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_CFBundleDisplayName = "Lid Up";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2026 Hemal Modi";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hemalmodi.LidUpAnimation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -281,27 +402,27 @@
 			};
 			name = Debug;
 		};
-		000000000000000112000000 /* Release configuration for PBXNativeTarget "LidUpAnimation" */ = {
+		000000000000000112000000 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LidUpAnimation/LidUpAnimation.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 542W8Z2VM3;
-				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Lid Up";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_CFBundleDisplayName = "Lid Up";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2026 Hemal Modi";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hemalmodi.LidUpAnimation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -315,26 +436,111 @@
 			};
 			name = Release;
 		};
+		3B9B1202E5E41D11F708CA27 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 542W8Z2VM3;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hemalmodi.LidUpAnimationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LidUpAnimation.app/Contents/MacOS/LidUpAnimation";
+			};
+			name = Debug;
+		};
+		875010492B6A413192538CBB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 542W8Z2VM3;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hemalmodi.LidUpAnimationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LidUpAnimation.app/Contents/MacOS/LidUpAnimation";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		000000000000000010000000 /* Build configuration list for PBXProject "LidUpAnimation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000011000000 /* Debug configuration for PBXProject "LidUpAnimation" */,
-				000000000000000012000000 /* Release configuration for PBXProject "LidUpAnimation" */,
+				000000000000000011000000 /* Debug */,
+				000000000000000012000000 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
 		000000000000000110000000 /* Build configuration list for PBXNativeTarget "LidUpAnimation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				000000000000000111000000 /* Debug configuration for PBXNativeTarget "LidUpAnimation" */,
-				000000000000000112000000 /* Release configuration for PBXNativeTarget "LidUpAnimation" */,
+				000000000000000111000000 /* Debug */,
+				000000000000000112000000 /* Release */,
 			);
 			defaultConfigurationName = Release;
 		};
+		1CFC9210EB632182F72D467A /* Build configuration list for PBXNativeTarget "LidUpAnimationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				875010492B6A413192538CBB /* Release */,
+				3B9B1202E5E41D11F708CA27 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1800E3466F70EB0444A4FA85 /* XCRemoteSwiftPackageReference "DrawablySwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hemal08ce094/DrawablySwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+		4F28541E400965544586353C /* XCRemoteSwiftPackageReference "ThinkingOrbsSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hemal08ce094/ThinkingOrbsSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		05B3BFF48F01019B99C4C88A /* Drawably */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1800E3466F70EB0444A4FA85 /* XCRemoteSwiftPackageReference "DrawablySwiftUI" */;
+			productName = Drawably;
+		};
+		97105E12C081F5A13423CE2F /* ThinkingOrbs */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4F28541E400965544586353C /* XCRemoteSwiftPackageReference "ThinkingOrbsSwiftUI" */;
+			productName = ThinkingOrbs;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 000000000000000000000000 /* Project object */;
 }

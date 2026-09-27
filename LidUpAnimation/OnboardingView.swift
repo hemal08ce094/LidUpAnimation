@@ -1,5 +1,7 @@
 import Combine
+import Drawably
 import SwiftUI
+import ThinkingOrbs
 
 /// First-run window. Explains the one permission and asks for it.
 struct OnboardingView: View {
@@ -10,20 +12,22 @@ struct OnboardingView: View {
     @State private var isGranted = ScreenRecordingPermission.isGranted
     @State private var hasRequested = false
     private let poll = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let paper = Color(nsColor: .windowBackgroundColor)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 14) {
-                Image(systemName: "laptopcomputer")
-                    .font(.system(size: 40, weight: .light))
+                ThinkingOrb(controller.isSensorAvailable ? .listening : .breathing, size: .large)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Lid Up").font(.title.bold())
                     Text("The iPhone Duo fold, for your MacBook lid.")
                         .foregroundStyle(.secondary)
                 }
             }
+            .padding(10)
+            .adaptiveGlass(cornerRadius: 14)
 
-            Text("As you close the lid, the desktop stays anchored in space, frosts over and slips into black. Open it back up and it returns.")
+            DrawablyText(Text("As you close the lid, the desktop stays anchored in space, frosts over and slips into black. \(Text("Open it back up").drawably(.underline)) and it returns."))
                 .fixedSize(horizontal: false, vertical: true)
 
             GroupBox {
@@ -83,6 +87,7 @@ struct OnboardingView: View {
         .onReceive(poll) { _ in
             isGranted = ScreenRecordingPermission.isGranted
         }
+        .drawably(stroke: .accentColor, fill: .accentColor, paper: paper)
     }
 
     private func row(ok: Bool, title: String, detail: String) -> some View {

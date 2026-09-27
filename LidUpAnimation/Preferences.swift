@@ -41,6 +41,16 @@ final class Preferences: ObservableObject {
 
     @Published var hasCompletedOnboarding: Bool { didSet { save(hasCompletedOnboarding, "hasCompletedOnboarding") } }
 
+    /// The chosen visual mood for the fold. Stored as a raw string so an
+    /// unrecognised value (an older build, say) falls back to `.classic`
+    /// instead of crashing.
+    @Published var foldStyleID: String { didSet { save(foldStyleID, "foldStyleID") } }
+
+    var foldStyle: FoldStyle {
+        get { FoldStyle(rawValue: foldStyleID) ?? .classic }
+        set { foldStyleID = newValue.rawValue }
+    }
+
     /// Mirrors `SMAppService`. Setting it registers or unregisters the app.
     @Published var launchesAtLogin: Bool {
         didSet {
@@ -71,6 +81,7 @@ final class Preferences: ObservableObject {
         "stillDelay": 2.0,
         "showsAngleInMenuBar": false,
         "hasCompletedOnboarding": false,
+        "foldStyleID": FoldStyle.classic.rawValue,
     ]
 
     private init() {
@@ -86,6 +97,7 @@ final class Preferences: ObservableObject {
         stillDelay = defaults.double(forKey: "stillDelay")
         showsAngleInMenuBar = defaults.bool(forKey: "showsAngleInMenuBar")
         hasCompletedOnboarding = defaults.bool(forKey: "hasCompletedOnboarding")
+        foldStyleID = defaults.string(forKey: "foldStyleID") ?? FoldStyle.classic.rawValue
         launchesAtLogin = SMAppService.mainApp.status == .enabled
     }
 

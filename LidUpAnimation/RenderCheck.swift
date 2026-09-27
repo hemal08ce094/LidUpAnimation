@@ -4,13 +4,16 @@ import Metal
 /// Offscreen check: renders the fold over generated artwork at a series of
 /// lid angles and writes PNGs, so the look can be inspected without a lid.
 ///
-///     LidUpAnimation --render-check /path/to/output [source-image [WxH]]
+///     LidUpAnimation --render-check /path/to/output [source-image [WxH [style]]]
 ///
 /// With a source image the frames are rendered over it instead of the
 /// generated artwork, at the given point size (default 1440x900, at 2x).
+/// One subdirectory per fold style is written (`classic/`, `auroraGlass/`,
+/// …); pass a style's raw value as the fourth argument to render only that
+/// one, for example when generating one App Store screenshot set per style.
 enum RenderCheck {
 
-    static func run(outputDirectory: String, sourceImage: String? = nil, pointSize: String? = nil) -> Int32 {
+    static func run(outputDirectory: String, sourceImage: String? = nil, pointSize: String? = nil, styleFilter: String? = nil) -> Int32 {
         var size = CGSize(width: 1512, height: 982)
         if let pointSize {
             let parts = pointSize.split(separator: "x").compactMap { Double($0) }
@@ -47,18 +50,31 @@ enum RenderCheck {
         let reference = 112.0
         let darkAngle = 25.0
         let angles: [Double] = [112, 108, 100, 90, 80, 70, 60, 50, 40, 30, 22]
-        for angle in angles {
-            let progress = min(max((reference - angle) / (reference - darkAngle), 0), 1)
-            let parameters = FoldParameters(
-                referenceAngle: reference, currentAngle: angle, progress: progress,
-                viewingDistance: 2.5, maxBlurRadius: 90, maxDim: 1
-            )
-            renderer.render(parameters, into: target)
-            let name = String(format: "fold_%03d.png", Int(angle))
-            save(texture: target, to: directory.appendingPathComponent(name))
+        let styles = FoldStyle.allCases.filter { styleFilter == nil || $0.rawValue == styleFilter }
+        guard !styles.isEmpty else {
+            FileHandle.standardError.write("unknown style '\(styleFilter ?? "")'\n".data(using: .utf8)!)
+            return 1
+        }
+        var totalFrames = 0
+        for style in styles {
+            let styleDirectory = directory.appendingPathComponent(style.rawValue)
+            try? FileManager.default.createDirectory(at: styleDirectory, withIntermediateDirectories: true)
+            let tone = style.tone
+            for angle in angles {
+                let progress = min(max((reference - angle) / (reference - darkAngle), 0), 1)
+                let parameters = FoldParameters(
+                    referenceAngle: reference, currentAngle: angle, progress: progress,
+                    viewingDistance: 2.5, maxBlurRadius: 90, maxDim: 1,
+                    toneShadow: tone.shadow, toneHighlight: tone.highlight, toneStrength: tone.strength
+                )
+                renderer.render(parameters, into: target)
+                let name = String(format: "fold_%03d.png", Int(angle))
+                save(texture: target, to: styleDirectory.appendingPathComponent(name))
+                totalFrames += 1
+            }
         }
         save(image: artwork, to: directory.appendingPathComponent("source.png"))
-        print("wrote \(angles.count) frames to \(directory.path)")
+        print("wrote \(totalFrames) frame(s) across \(styles.count) style(s) to \(directory.path)")
         return 0
     }
 

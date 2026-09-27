@@ -1,0 +1,24 @@
+{
+  "originHash" : "3a4197d33a5c59462a00061f7fe70af945d1267a9c06dab5dee144b78e19b610",
+  "pins" : [
+    {
+      "identity" : "drawablyswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hemal08ce094/DrawablySwiftUI",
+      "state" : {
+        "revision" : "a8502390a072ef89738df45058488e1c50d243ab",
+        "version" : "0.1.0"
+      }
+    },
+    {
+      "identity" : "thinkingorbsswiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/hemal08ce094/ThinkingOrbsSwiftUI",
+      "state" : {
+        "revision" : "9ce35f21dfb14353b297e8adc82b76d24f066496",
+        "version" : "0.2.0"
+      }
+    }
+  ],
+  "version" : 3
+}

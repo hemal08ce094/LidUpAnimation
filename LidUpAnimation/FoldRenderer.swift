@@ -25,6 +25,10 @@ struct FoldParameters {
     var maxBlurRadius: Double = 90
     /// Darkening at full progress, 0...1.
     var maxDim: Double = 1
+    /// Fold style duotone, linear-light RGB. `toneStrength` 0 disables it.
+    var toneShadow: SIMD3<Double> = .zero
+    var toneHighlight: SIMD3<Double> = .zero
+    var toneStrength: Double = 0
 }
 
 /// Draws the fold with Metal.
@@ -46,6 +50,8 @@ final class FoldRenderer {
         var tex: SIMD4<Float>      // padded origin xy, padded size xy (points)
         var blur: SIMD4<Float>     // max radius px, strength, hinge floor, max mip level
         var dim: SIMD4<Float>      // strength, hinge floor, reach, max dim
+        var toneShadow: SIMD4<Float>    // style tint, shadow rgb + strength
+        var toneHighlight: SIMD4<Float> // style tint, highlight rgb (w unused)
     }
 
     static let shaderSource = """
@@ -59,6 +65,8 @@ final class FoldRenderer {
         float4 tex;
         float4 blur;
         float4 dim;
+        float4 toneShadow;
+        float4 toneHighlight;
     };
 
     vertex float4 foldVertex(uint vid [[vertex_id]]) {
@@ -120,6 +128,13 @@ final class FoldRenderer {
 
         float spread = smoothstep(0.0, max(u.dim.z, 0.02), height);
         float fade = u.dim.x * (u.dim.y + (1.0 - u.dim.y) * spread);
+        // A fold style washes the picture towards a duotone before it goes
+        // dark. Zero strength (the classic style) leaves colour untouched.
+        if (u.toneShadow.w > 0.0001) {
+            float luma = dot(colour, float3(0.2126, 0.7152, 0.0722));
+            float3 duotone = mix(u.toneShadow.rgb, u.toneHighlight.rgb, clamp(luma, 0.0, 1.0));
+            colour = mix(colour, duotone, clamp(u.toneShadow.w * fade, 0.0, 1.0));
+        }
         // Samples are linear light; the power keeps the setting perceptual.
         colour *= pow(max(1.0 - u.dim.w * fade, 0.0), 2.2);
         return float4(colour, 1.0);
@@ -335,7 +350,9 @@ final class FoldRenderer {
             tex: SIMD4(Float(-Self.padding), Float(-Self.padding),
                        Float(width + 2 * Double(Self.padding)), Float(height + 2 * Double(Self.padding))),
             blur: SIMD4(Float(p.maxBlurRadius * Double(pixelScale)), Float(blurStrength), Float(blurFloor), maxLevel),
-            dim: SIMD4(Float(dimStrength), Float(dimFloor), 0.6, Float(p.maxDim))
+            dim: SIMD4(Float(dimStrength), Float(dimFloor), 0.6, Float(p.maxDim)),
+            toneShadow: SIMD4(Float(p.toneShadow.x), Float(p.toneShadow.y), Float(p.toneShadow.z), Float(p.toneStrength)),
+            toneHighlight: SIMD4(Float(p.toneHighlight.x), Float(p.toneHighlight.y), Float(p.toneHighlight.z), 0)
         )
     }
 

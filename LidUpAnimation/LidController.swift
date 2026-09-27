@@ -440,13 +440,17 @@ final class LidController: ObservableObject {
     private func parameters(for angle: Double) -> FoldParameters {
         let span = max(referenceAngle - preferences.darkAngle, 10)
         let progress = min(max((referenceAngle - angle) / span, 0), 1)
+        let tone = preferences.foldStyle.tone
         return FoldParameters(
             referenceAngle: referenceAngle,
             currentAngle: angle,
             progress: progress,
             viewingDistance: preferences.viewingDistance,
             maxBlurRadius: preferences.maxBlurRadius,
-            maxDim: preferences.maxDim
+            maxDim: preferences.maxDim,
+            toneShadow: tone.shadow,
+            toneHighlight: tone.highlight,
+            toneStrength: tone.strength
         )
     }
 

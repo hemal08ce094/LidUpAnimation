@@ -1,5 +1,8 @@
 import Combine
+import Drawably
 import SwiftUI
+import ThinkingOrbs
+import TipKit
 
 /// The menu bar panel.
 struct MenuPanelView: View {
@@ -8,11 +11,15 @@ struct MenuPanelView: View {
 
     @State private var isGranted = ScreenRecordingPermission.isGranted
     @State private var showsTuning = false
+    @State private var showsStyleGallery = false
     private let poll = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    private let styleTip = FoldStyleTip()
+    private let paper = Color(nsColor: .windowBackgroundColor)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
+                ThinkingOrb(statusOrb, size: .small)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Lid Up").font(.headline)
                     Text(status).font(.caption).foregroundStyle(.secondary)
@@ -56,6 +63,26 @@ struct MenuPanelView: View {
             }
             .disabled(!preferences.isEnabled || controller.isPreviewing || controller.phase != .idle)
 
+            Button {
+                showsStyleGallery = true
+                styleTip.invalidate(reason: .actionPerformed)
+            } label: {
+                HStack {
+                    Label("Styles", systemImage: preferences.foldStyle.symbolName)
+                    Text(preferences.foldStyle.title)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    DrawablyBadge("new", variant: .scribble)
+                }
+            }
+            .popover(isPresented: $showsStyleGallery, arrowEdge: .trailing) {
+                StyleGalleryView(preferences: preferences, controller: controller) {
+                    showsStyleGallery = false
+                }
+            }
+            .popoverTip(styleTip, arrowEdge: .trailing)
+
             DisclosureGroup("Tuning", isExpanded: $showsTuning) {
                 VStack(alignment: .leading, spacing: 10) {
                     slider("Anchor angle", value: $preferences.anchorAngle, in: 60...140, step: 1, unit: "°")
@@ -86,12 +113,12 @@ struct MenuPanelView: View {
             }
             .font(.callout)
 
-            Divider()
+            DrawablyDivider()
 
             Toggle("Show angle in menu bar", isOn: $preferences.showsAngleInMenuBar)
             Toggle("Launch at login", isOn: $preferences.launchesAtLogin)
 
-            Divider()
+            DrawablyDivider()
 
             HStack {
                 Button("Quit") { NSApp.terminate(nil) }
@@ -109,6 +136,20 @@ struct MenuPanelView: View {
         }
         .onAppear { controller.angleObservers += 1 }
         .onDisappear { controller.angleObservers -= 1 }
+        .drawably(stroke: .accentColor, fill: .accentColor, paper: paper)
+    }
+
+    /// The one status indicator that's always on screen while the app is
+    /// running maps to the orb whose meaning is closest to what's actually
+    /// happening, instead of a generic spinner.
+    private var statusOrb: OrbState {
+        guard controller.isSensorAvailable else { return .breathing }
+        switch controller.phase {
+        case .active, .clearing: return .working
+        case .idle:
+            if controller.isPreviewing { return .shaping }
+            return preferences.isEnabled ? .listening : .breathing
+        }
     }
 
     private var status: String {

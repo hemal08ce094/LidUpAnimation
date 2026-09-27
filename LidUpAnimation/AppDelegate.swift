@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import TipKit
 
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -15,10 +16,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let directory = arguments.indices.contains(index + 1) ? arguments[index + 1] : "render-check"
             let source = arguments.indices.contains(index + 2) ? arguments[index + 2] : nil
             let size = arguments.indices.contains(index + 3) ? arguments[index + 3] : nil
-            exit(RenderCheck.run(outputDirectory: directory, sourceImage: source, pointSize: size))
+            let style = arguments.indices.contains(index + 4) ? arguments[index + 4] : nil
+            exit(RenderCheck.run(outputDirectory: directory, sourceImage: source, pointSize: size, styleFilter: style))
         }
 
+        try? Tips.configure()
+
         controller.start()
+        LidBridge.shared.controller = controller
 
         if !preferences.hasCompletedOnboarding || !ScreenRecordingPermission.isGranted {
             showOnboarding()
