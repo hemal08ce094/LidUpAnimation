@@ -25,7 +25,7 @@ enum FoldStyleAppEnum: String, AppEnum {
 }
 
 /// A tiny status card shown under an intent's spoken reply.
-private struct FoldSnippetView: View {
+struct FoldSnippetView: View {
     let orb: OrbState
     let title: String
     let subtitle: String
@@ -58,7 +58,9 @@ struct PreviewFoldIntent: AppIntent {
         let style = Preferences.shared.foldStyle
         return .result(
             dialog: "Previewing the fold.",
-            view: FoldSnippetView(orb: .shaping, title: "Previewing the fold", subtitle: style.title)
+            // `.working`, not `.shaping`: a freshly created morph orb can crash
+            // (ThinkingOrbs indexes its shape cycle with a negative time).
+            view: FoldSnippetView(orb: .working, title: "Previewing the fold", subtitle: style.title)
         )
     }
 }

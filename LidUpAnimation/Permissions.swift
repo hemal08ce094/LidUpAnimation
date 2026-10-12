@@ -6,7 +6,14 @@ import CoreGraphics
 /// The lid angle sensor itself needs no permission.
 enum ScreenRecordingPermission {
 
-    static var isGranted: Bool { CGPreflightScreenCaptureAccess() }
+    static var isGranted: Bool {
+        #if DEBUG
+        // Store-media capture only: render the granted state without
+        // touching the real TCC grant.
+        if UserDefaults.standard.bool(forKey: "debugForceScreenRecordingGranted") { return true }
+        #endif
+        return CGPreflightScreenCaptureAccess()
+    }
 
     /// Shows the system prompt the first time. Later calls return the current
     /// state without prompting; the user then has to use System Settings.

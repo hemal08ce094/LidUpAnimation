@@ -20,7 +20,7 @@ struct OnboardingView: View {
                 ThinkingOrb(controller.isSensorAvailable ? .listening : .breathing, size: .large)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Lid Up").font(.title.bold())
-                    Text("The iPhone Duo fold, for your MacBook lid.")
+                    Text("Your desktop folds as the lid closes.")
                         .foregroundStyle(.secondary)
                 }
             }

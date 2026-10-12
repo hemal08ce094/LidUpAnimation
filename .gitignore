@@ -4,3 +4,8 @@ xcuserdata/
 .DS_Store
 store/
 .build-dd/
+build-tools/
+DerivedData/
+*.xcresult
+.build/
+AppStore/media-2026-09-27/

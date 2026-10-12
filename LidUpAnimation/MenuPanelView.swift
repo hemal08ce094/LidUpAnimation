@@ -8,6 +8,8 @@ import TipKit
 struct MenuPanelView: View {
     @ObservedObject var controller: LidController
     @ObservedObject var preferences: Preferences
+    /// Opens with the tuning section expanded (store-media capture).
+    var showsTuningInitially = false
 
     @State private var isGranted = ScreenRecordingPermission.isGranted
     @State private var showsTuning = false
@@ -134,7 +136,10 @@ struct MenuPanelView: View {
         .onReceive(poll) { _ in
             isGranted = ScreenRecordingPermission.isGranted
         }
-        .onAppear { controller.angleObservers += 1 }
+        .onAppear {
+            controller.angleObservers += 1
+            if showsTuningInitially { showsTuning = true }
+        }
         .onDisappear { controller.angleObservers -= 1 }
         .drawably(stroke: .accentColor, fill: .accentColor, paper: paper)
     }
@@ -147,7 +152,9 @@ struct MenuPanelView: View {
         switch controller.phase {
         case .active, .clearing: return .working
         case .idle:
-            if controller.isPreviewing { return .shaping }
+            // Not `.shaping`: ThinkingOrbs' morph mode indexes out of range
+            // when its first frame lands at a negative time (a fresh orb).
+            if controller.isPreviewing { return .working }
             return preferences.isEnabled ? .listening : .breathing
         }
     }

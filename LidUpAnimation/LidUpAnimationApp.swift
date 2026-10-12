@@ -15,7 +15,7 @@ struct LidUpAnimationApp: App {
     }
 }
 
-private struct MenuBarLabel: View {
+struct MenuBarLabel: View {
     @ObservedObject var controller: LidController
     @ObservedObject var preferences: Preferences
 

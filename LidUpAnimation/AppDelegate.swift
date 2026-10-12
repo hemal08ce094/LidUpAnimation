@@ -24,6 +24,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             exit(RenderCheck.run(outputDirectory: directory, sourceImage: arg(2), pointSize: arg(3), styleFilter: arg(4)))
         }
 
+        #if DEBUG
+        if let index = arguments.firstIndex(of: "--store-stage") {
+            StoreStage.run(arguments: Array(arguments[(index + 1)...]), delegate: self)
+            return
+        }
+        #endif
+
         try? Tips.configure()
 
         controller.start()
