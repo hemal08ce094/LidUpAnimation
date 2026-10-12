@@ -9,3 +9,14 @@ DerivedData/
 *.xcresult
 .build/
 AppStore/media-2026-09-27/
+*.xcuserstate
+.env
+.env.*
+*.p8
+*.p12
+*.pem
+*.key
+*.mobileprovision
+node_modules/
+*.ipa
+*.xcarchive
