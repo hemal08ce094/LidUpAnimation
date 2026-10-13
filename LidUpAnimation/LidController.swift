@@ -145,6 +145,16 @@ final class LidController: ObservableObject {
         endImmediately()
     }
 
+    #if DEBUG
+    /// Store-stage only: shows a lid reading on Macs without the hinge sensor.
+    func stageOverride(angle: Double, phase: Phase?) {
+        isSensorAvailable = true
+        statusMessage = ""
+        currentAngle = angle
+        if let phase { self.phase = phase }
+    }
+    #endif
+
     /// Plays the effect once without moving the lid.
     /// Without Screen Recording it plays over the desktop wallpaper instead
     /// of the live screen.
@@ -368,9 +378,11 @@ final class LidController: ObservableObject {
 
     private func finish() {
         lidLog.notice("finish: angle \(self.rawAngle, format: .fixed(precision: 2))")
+        let played = overlay.isVisible && phase == .clearing
         stopDisplayLink()
         overlay.dismiss(animated: true)
         phase = .idle
+        if played { ReviewPrompt.recordFinishedFold() }
         if preview == nil {
             stillAnchor = rawAngle
             stillAnchorTime = CACurrentMediaTime()

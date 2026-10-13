@@ -37,7 +37,17 @@ enum StoreStage {
         let controller = delegate.controller
         controller.start()
         LidBridge.shared.controller = controller
+        let env = ProcessInfo.processInfo.environment
+        if let angle = env["STAGE_ANGLE"].flatMap(Double.init) {
+            let phase: LidController.Phase? = switch env["STAGE_PHASE"] {
+            case "active": .active
+            case "clearing": .clearing
+            default: nil
+            }
+            controller.stageOverride(angle: angle, phase: phase)
+        }
         let snapshot = Snapshot(preferences)
+        if let style = env["STAGE_STYLE"].flatMap(FoldStyle.init(rawValue:)) { preferences.foldStyle = style }
 
         let model = StageModel()
         let root = StageView(scene: scene, wallpaper: wallpaper, model: model,
@@ -60,11 +70,28 @@ enum StoreStage {
         print("STAGE \(window.windowNumber) \(Int(rect.minX)),\(Int(screen.height - rect.maxY)),\(Int(size.width)),\(Int(size.height))")
         fflush(stdout)
 
+        // STAGE_SNAP="<prefix>:<t1>,<t2>" writes <prefix>_<t>.png from the window's
+        // own backing store, for hosts where screencapture lacks permission.
+        var snaps: [Double] = []
+        var snapPrefix = ""
+        if let spec = ProcessInfo.processInfo.environment["STAGE_SNAP"], let colon = spec.lastIndex(of: ":") {
+            snapPrefix = String(spec[..<colon])
+            snaps = spec[spec.index(after: colon)...].split(separator: ",").compactMap { Double($0) }.sorted()
+        }
+
         let start = Date()
         timer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30, repeats: true) { _ in
             MainActor.assumeIsolated {
                 let t = Date().timeIntervalSince(start)
                 script(scene: scene, t: t, preferences: preferences, model: model)
+                if let next = snaps.first, t >= next, let view = window.contentView {
+                    snaps.removeFirst()
+                    writeSnap(view, to: "\(snapPrefix)_\(next.formatted(.number.precision(.fractionLength(0...2)))).png")
+                    if snaps.isEmpty {
+                        snapshot.restore(preferences)
+                        exit(0)
+                    }
+                }
                 let limit = seconds > 0 ? seconds + 1.5 : 25
                 if t > limit {
                     snapshot.restore(preferences)
@@ -79,6 +106,7 @@ enum StoreStage {
     private static func script(scene: String, t: Double, preferences: Preferences, model: StageModel) {
         switch scene {
         case "gallery":
+            guard ProcessInfo.processInfo.environment["STAGE_STYLE"] == nil else { break }
             let order: [FoldStyle] = [.classic, .auroraGlass, .inkWash, .coolDusk]
             let index = t < 1.2 ? 0 : (Int((t - 1.2) / 1.6) + 1) % order.count
             if preferences.foldStyle != order[index] {
@@ -103,6 +131,23 @@ enum StoreStage {
         default:
             break
         }
+    }
+
+    private static func writeSnap(_ view: NSView, to path: String) {
+        // STAGE_SNAP_SCALE renders at a custom pixel scale (2.88 turns a 1000x625 stage into 2880x1800).
+        let scale = ProcessInfo.processInfo.environment["STAGE_SNAP_SCALE"].flatMap(Double.init) ?? 2
+        let bounds = view.bounds
+        guard let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int((bounds.width * scale).rounded()),
+                                         pixelsHigh: Int((bounds.height * scale).rounded()), bitsPerSample: 8,
+                                         samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                         colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return }
+        rep.size = bounds.size
+        view.effectiveAppearance.performAsCurrentDrawingAppearance {
+            view.cacheDisplay(in: bounds, to: rep)
+        }
+        try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+        print("SNAP \(path)")
+        fflush(stdout)
     }
 
     private static func parseSize(_ s: String?) -> CGSize? {
